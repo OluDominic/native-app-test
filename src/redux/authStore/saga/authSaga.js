@@ -1,11 +1,11 @@
 import { call, takeEvery } from "redux-saga/effects";
-import { authService } from "../services";
 import { loginError, loginPending, loginSuccess, registerPending, registerSuccess } from "../actions";
+import { authService } from "../services";
 
 export function* callSignIn({payload: {data}}) {
     try {
         const response = yield call(authService.signInService, data);
-        yield put(loginSuccess(response.data))
+        yield put(loginSuccess(response))
     } catch (error) {
         yield put(loginError(error))
     }
@@ -14,7 +14,7 @@ export function* callSignIn({payload: {data}}) {
 export function* callRegister({payload: {data}}) {
     try {
         const response = yield call(authService.registerService, data);
-        yield put(registerSuccess(response.data))
+        yield put(registerSuccess(response))
     } catch (error) {
         yield put(registerError(error))
     }

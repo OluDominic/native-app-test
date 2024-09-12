@@ -30,6 +30,8 @@ import Home from './src/Home/home';
 import Splash from './src/welcome/splash';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
 import AppNavigationContainer from './src/navigation';
+import { Provider } from 'react-redux';
+import store from './src/redux/rootStore';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -53,11 +55,13 @@ function App(): JSX.Element {
 
 
   return (
+    <Provider store={store}>
     <SafeAreaProvider>
       <SafeAreaView style={{ flex: 1}}>
         <AppNavigationContainer />
       </SafeAreaView>
   </SafeAreaProvider>
+  </Provider>
   );
 }
 

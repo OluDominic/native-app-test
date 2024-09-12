@@ -28,6 +28,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createNativeStackNavigator } from '@react-navigation/native-stack';
 import Home from './src/Home/home';
 import Splash from './src/welcome/splash';
+import { SafeAreaProvider } from 'react-native-safe-area-context';
+import AppNavigationContainer from './src/navigation';
 
 type SectionProps = PropsWithChildren<{
   title: string;
@@ -51,14 +53,11 @@ function App(): JSX.Element {
 
 
   return (
-    <SafeAreaView style={backgroundStyle}>
-      <NavigationContainer>
-      <Stack.Navigator>
-        <Stack.Screen name="Home" component={Home} />
-        <Stack.Screen name="Splash" component={Splash} />
-      </Stack.Navigator>
-    </NavigationContainer>
-    </SafeAreaView>
+    <SafeAreaProvider>
+      <SafeAreaView style={{ flex: 1}}>
+        <AppNavigationContainer />
+      </SafeAreaView>
+  </SafeAreaProvider>
   );
 }
 

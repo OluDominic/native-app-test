@@ -5,6 +5,9 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
 import { login } from '../../redux/authStore/actions';
 import { useNavigation } from '@react-navigation/native';
+import { clearLoginError } from '../../redux/authStore/authSlice';
+import { createTables } from '../../db/signInDb';
+import { HOME_ROUTE } from '../../constants/routes';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -13,13 +16,25 @@ const Login = () => {
     const { signInLoading, isSignInSuccess, signInError } = useSelector(state => state.auth);
     const dispatch = useDispatch();
 
+    useEffect(() => {
+        createTables();
+    }, []);
+
     const handleLogin = () => {
         dispatch(login(email, password));
     };
 
     useEffect(()=> {
-        console.log(signInLoading, 'loading')
-    }, [signInLoading])
+        if (signInError) {
+            setTimeout(() => {
+                dispatch(clearLoginError())
+            }, 10000)
+            return ()=> {
+                dispatch(clearLoginError())
+            }
+            
+        }
+    }, [signInError])
 
     // Handling login side effects
     useEffect(() => {
@@ -27,7 +42,8 @@ const Login = () => {
             Alert.alert('Login Successful', 'You have logged in successfully!', [
                 {
                     text: 'OK',
-                    onPress: () => navigation.replace('App') // Navigate to 'App' stack
+                    onPress: () => navigation.navigate('App', { screen: HOME_ROUTE })
+                
                 }
             ]);
         }

@@ -1,5 +1,5 @@
 import { call, put, takeEvery } from "redux-saga/effects";
-import { login, loginError, loginSuccess, register, registerSuccess } from "../actions";
+import { login, loginError, loginSuccess, register, registerError, registerSuccess } from "../actions";
 import { authService } from "../services";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
@@ -21,7 +21,9 @@ export function* callRegister({payload: {firstname, lastname, email, password}})
     try {
         const response = yield call(authService.registerService, {firstname, lastname, email, password});
         yield put(registerSuccess(response))
+        console.log(response, 'signup data')
     } catch (error) {
+        console.log('error signing up', error);
         yield put(registerError(error))
     }
 };

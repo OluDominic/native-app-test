@@ -4,6 +4,8 @@ import { TextInput, Button, Text } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { register } from '../../redux/authStore/actions';
 import { useNavigation } from '@react-navigation/native';
+import { createTables } from '../../db/signInDb';
+import { LOGIN_ROUTE } from '../../constants/routes';
 
 const Register = () => {
     const [firstname, setFirstname] = useState('');
@@ -12,9 +14,12 @@ const Register = () => {
     const [password, setPassword] = useState('');
     const navigation = useNavigation();
     
-    // Accessing the registration states from Redux
     const { registerLoading, registerSuccess, isRegisterSuccess, registerError } = useSelector(state => state.auth);
     const dispatch = useDispatch();
+
+    useEffect(() => {
+        createTables();
+    }, []);
 
     const handleRegister = () => {
         // Dispatch the register action
@@ -26,17 +31,22 @@ const Register = () => {
         ));
     };
 
-    // Handling registration side effects
     useEffect(() => {
         if (isRegisterSuccess) {
             Alert.alert('Registration Successful', 'You have registered successfully!', [{ text: 'OK' }]);
+            const timer = setTimeout(() => {
+                navigation.navigate(LOGIN_ROUTE);
+            }, 3000);
+
+            return () => clearTimeout(timer);
         }
     }, [isRegisterSuccess]);
+    
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.container}>
-        <Button onPress={()=> navigation.goBack()} icon={'arrow-left'} />
+            <Button onPress={()=> navigation.goBack()} icon={'arrow-left'} />
             <Text style={styles.title}>Register</Text>            
             <TextInput
                 label="First Name"

@@ -17,6 +17,9 @@ const authSlice = createSlice({
             state.registerSuccess = {};
             state.isRegisterSuccess = false;
             state.registerError = '';
+        },
+        clearLoginError: state => {
+            state.signInError = "";
         }
     },
     extraReducers: (builder) => {
@@ -52,5 +55,7 @@ const authSlice = createSlice({
         })
     }
 });
+
+export const {logoutUser, clearLoginError} = authSlice.actions;
 
 export default authSlice.reducer;

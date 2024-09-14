@@ -1,5 +1,5 @@
 import SQLite from 'react-native-sqlite-storage'
-
+import { useEffect } from 'react';
 
 const db = SQLite.openDatabase({
     name: 'userDB',
@@ -12,11 +12,16 @@ const db = SQLite.openDatabase({
 export const createTables = () => {
     db.transaction((tx) => {
         tx.executeSql(
-            "CREATE TABLE IF NOT EXISTS "
-            +"users "
-            +"(ID INTEGER PRIMARY KEY AUTOINCREMENT, firstname TEXT, lastname TEXT, email TEXT unique, password TEXT)"
-        )
-    })
+            "CREATE TABLE IF NOT EXISTS users (ID INTEGER PRIMARY KEY AUTOINCREMENT, firstname TEXT, lastname TEXT, email TEXT unique, password TEXT)",
+            [],
+            () => {
+                console.log('Table "users" created successfully or already exists.');
+            },
+            (tx, error) => {
+                console.log('Error creating table "users": ' + error.message);
+            }
+        );
+    });
 };
 
 export const registerUser = (firstname, lastname, email, password, callback) => {

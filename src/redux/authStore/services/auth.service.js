@@ -3,14 +3,12 @@ import { loginUser, registerUser } from '../../../db/signInDb';
 
 export default class AuthService {
     signInService ({email, password}) {
-        //const { email, password } = data
-        console.log(data, 'service data')
         return new Promise ((resolve, reject) => {
             loginUser(email, password, (user) => {
                 if (user) {
                     resolve(user);
                 } else {
-                    reject('Invalid email or password');
+                    reject(new Error('Invalid email or password'));
                 }
             })
         })

@@ -22,7 +22,7 @@ export const createTables = () => {
 export const registerUser = (firstname, lastname, email, password, callback) => {
     db.transaction((tx) => {
         tx.executeSql(
-            "INSERT INTO users (firstname, lastname, email, password) values (?, ?, ?);",
+            "INSERT INTO users (firstname, lastname, email, password) values (?, ?, ?, ?);",
             [firstname, lastname, email, password],
             (tx, result) => {
                 console.log('User registered successfully!');
@@ -35,22 +35,24 @@ export const registerUser = (firstname, lastname, email, password, callback) => 
     })
 };
 
-export const loginUser =(email, password, callback) => {
+export const loginUser = (email, password, callback) => {
     db.transaction((tx) => {
         tx.executeSql(
-            'SELECT FROM users WHERE email = ? AND password = ?;',
+            'SELECT * FROM users WHERE email = ? AND password = ?;',
             [email, password],
-            (tx, result)=> {
+            (tx, result) => {
                 if (result.rows.length > 0) {
                     callback(result.rows.item(0));
                 } else {
-                    callback(null)
+                    callback(null);
                 }
             },
-            error => {
-                console.log('Error logging in: ' + error.message);
+            (error) => {
+                // Pass error message or object directly to the callback
+                callback(null); // Ensure callback is called to handle errors
+                console.error('Error logging in:', error.message || error);
             }
         );
-    })
-}
+    });
+};
 

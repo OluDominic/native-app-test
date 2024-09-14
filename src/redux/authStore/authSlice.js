@@ -1,4 +1,4 @@
-import { loginError, loginPending, loginSuccess, registerError, registerPending, registerSuccess } from "./actions";
+import { loginError, login, loginSuccess, registerError, register, registerSuccess } from "./actions";
 import { authState } from "./state";
 
 const { createSlice } = require("@reduxjs/toolkit");
@@ -6,10 +6,23 @@ const { createSlice } = require("@reduxjs/toolkit");
 const authSlice = createSlice({
     name: 'auth',
     initialState: authState,
+    reducers: {
+        logoutUser: state => {
+            state.authenticated = false;
+            state.signInLoading = false;
+            state.signInSuccess = {};
+            state.isSignInSuccess = false;
+            state.signInError = '';
+            state.registerLoading = false;
+            state.registerSuccess = {};
+            state.isRegisterSuccess = false;
+            state.registerError = '';
+        }
+    },
     extraReducers: (builder) => {
         builder
-        .addCase(loginPending, (state) => {
-            state.sig = true;
+        .addCase(login, (state) => {
+            state.signInLoading = true;
         })
         .addCase(loginSuccess, (state, action)=> {
             state.signInLoading = false;
@@ -19,10 +32,11 @@ const authSlice = createSlice({
         .addCase(loginError, (state, action)=> {
             state.signInLoading = false;
             state.signInSuccess = null;
+            state.authenticated = true,
             state.isSignInSuccess = false;
-            state.signInError = action.payload
+            state.signInError = action.payload.message
         })
-        .addCase(registerPending, (state) => {
+        .addCase(register, (state) => {
             state.registerLoading = true;
         })
         .addCase(registerSuccess, (state, action)=> {

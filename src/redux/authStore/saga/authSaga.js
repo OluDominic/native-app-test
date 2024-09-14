@@ -1,19 +1,25 @@
-import { call, takeEvery } from "redux-saga/effects";
-import { loginError, loginPending, loginSuccess, registerPending, registerSuccess } from "../actions";
+import { call, put, takeEvery } from "redux-saga/effects";
+import { login, loginError, loginSuccess, register, registerSuccess } from "../actions";
 import { authService } from "../services";
+import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export function* callSignIn({payload: {data}}) {
+export function* callSignIn({payload: {email, password}}) {
+    console.log({ email, password }, 'Saga signin data');
     try {
-        const response = yield call(authService.signInService, data);
-        yield put(loginSuccess(response))
+        const response = yield call(authService.signInService, {email, password});
+        yield put(loginSuccess(response));
+        yield call(AsyncStorage.setItem('userData',  JSON.stringify(response)))
     } catch (error) {
-        yield put(loginError(error))
+        const errorMessage = error.message || 'An unexpected error occurred';
+        console.log('error signin', errorMessage);
+        yield put(loginError({ message: errorMessage }));
     }
 };
 
-export function* callRegister({payload: {data}}) {
+export function* callRegister({payload: {firstname, lastname, email, password}}) {
+    console.log({ firstname, lastname, email, password }, 'Saga signin data');
     try {
-        const response = yield call(authService.registerService, data);
+        const response = yield call(authService.registerService, {firstname, lastname, email, password});
         yield put(registerSuccess(response))
     } catch (error) {
         yield put(registerError(error))
@@ -21,9 +27,9 @@ export function* callRegister({payload: {data}}) {
 };
 
 export function* watchLogin() {
-    yield takeEvery(loginPending.type, callSignIn)
+    yield takeEvery(login.type, callSignIn)
 }
 
 export function* watchRegister() {
-    yield takeEvery(registerPending.type, callRegister)
+    yield takeEvery(register.type, callRegister)
 }

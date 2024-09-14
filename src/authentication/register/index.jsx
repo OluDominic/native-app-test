@@ -1,24 +1,43 @@
-import React, { useState } from 'react';
-import { View, StyleSheet } from 'react-native';
+import React, { useState, useEffect } from 'react';
+import { View, StyleSheet, Alert, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
+import { useDispatch, useSelector } from 'react-redux';
+import { register } from '../../redux/authStore/actions';
+import { useNavigation } from '@react-navigation/native';
 
 const Register = () => {
     const [firstname, setFirstname] = useState('');
     const [lastname, setLastname] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const navigation = useNavigation();
+    
+    // Accessing the registration states from Redux
+    const { registerLoading, registerSuccess, isRegisterSuccess, registerError } = useSelector(state => state.auth);
+    const dispatch = useDispatch();
 
     const handleRegister = () => {
-        // Handle registration logic here
-        console.log('First Name:', firstname);
-        console.log('Last Name:', lastname);
-        console.log('Email:', email);
-        console.log('Password:', password);
+        // Dispatch the register action
+        dispatch(register(
+            firstname,
+            lastname,
+            email,
+            password
+        ));
     };
 
+    // Handling registration side effects
+    useEffect(() => {
+        if (isRegisterSuccess) {
+            Alert.alert('Registration Successful', 'You have registered successfully!', [{ text: 'OK' }]);
+        }
+    }, [isRegisterSuccess]);
+
     return (
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
         <View style={styles.container}>
-            <Text style={styles.title}>Register</Text>
+        <Button onPress={()=> navigation.goBack()} icon={'arrow-left'} />
+            <Text style={styles.title}>Register</Text>            
             <TextInput
                 label="First Name"
                 value={firstname}
@@ -48,10 +67,20 @@ const Register = () => {
                 onChangeText={text => setPassword(text)}
                 style={styles.input}
             />
-            <Button mode="contained" onPress={handleRegister} style={styles.button}>
-                Register
-            </Button>
+
+            {/* Loader when registerLoading is true */}
+            {registerLoading ? (
+                <ActivityIndicator size="large" color="#0000ff" />
+            ) : (
+                <Button mode="contained" onPress={handleRegister} style={styles.button}>
+                    Register
+                </Button>
+            )}
+
+            {/* Displaying error message if there's any */}
+            {registerError ? <Text style={styles.error}>{registerError}</Text> : null}
         </View>
+        </TouchableWithoutFeedback>
     );
 };
 
@@ -72,6 +101,11 @@ const styles = StyleSheet.create({
     },
     button: {
         marginTop: 16,
+    },
+    error: {
+        marginTop: 16,
+        color: 'red',
+        textAlign: 'center',
     },
 });
 

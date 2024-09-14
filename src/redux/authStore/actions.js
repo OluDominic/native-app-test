@@ -1,10 +1,10 @@
 import { createAction } from '@reduxjs/toolkit';
 
-export const loginPending = createAction(
+export const login = createAction(
     'login/pending',
-    data => {
-        return {payload: data}
-    },
+    (email, password) => {
+        return { payload: { email, password } };
+    }
 );
 
 export const loginSuccess = createAction(
@@ -14,17 +14,15 @@ export const loginSuccess = createAction(
     },
 );
 
-export const loginError = createAction(
-    'login/error',
-    error => {
-        return {payload: error}
-    },
-);
+export const loginError = createAction('login/error', error => {
+    return { payload: { message: error.message } };
+});
 
-export const registerPending = createAction(
+
+export const register = createAction(
     'register/pending',
-    data => {
-        return {payload: data}
+    (firstname, lastname, email, password) => {
+        return {payload: {firstname, lastname, email, password}}
     },
 );
 

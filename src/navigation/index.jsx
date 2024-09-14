@@ -12,7 +12,7 @@ function AppNavigationContainer() {
   return (
     <NavigationContainer>
       <Stack.Navigator screenOptions={{headerShown: false}}>
-        {!authenticated ? (<Stack.Group>
+        {authenticated ? (<Stack.Group>
             <Stack.Screen name='App' component={AppNavigation} />
         </Stack.Group>) : (<Stack.Group>
             <Stack.Screen name='Auth' component={AuthNavigation}/>

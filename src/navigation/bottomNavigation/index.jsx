@@ -5,7 +5,7 @@ import { ABOUT_ROUTE, HOME_ROUTE } from '../../constants/routes';
 
 const Tab = createBottomTabNavigator();
 
-function MyTabs() {
+function BottomNavigation() {
   return (
     <Tab.Navigator>
       <Tab.Screen name={HOME_ROUTE} component={Home} />
@@ -13,3 +13,5 @@ function MyTabs() {
     </Tab.Navigator>
   );
 }
+
+export default BottomNavigation;

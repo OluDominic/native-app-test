@@ -1,13 +1,13 @@
 import React, { useEffect } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import * as Animatable from 'react-native-animatable';
-import { HOME_ROUTE, LOGIN_ROUTE } from "../constants/routes";
+import { HOME_ROUTE, LOGIN_ROUTE, ONBOARD_ROUTE } from "../constants/routes";
 
 const Splash = ({ navigation}) => {
 
     useEffect(() => {
         setTimeout(()=> {
-            navigation.navigate(LOGIN_ROUTE)
+            navigation.navigate(ONBOARD_ROUTE)
         }, 2000)
     })
     return (

@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Alert, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, StyleSheet, Alert, ActivityIndicator, TouchableWithoutFeedback, Keyboard, KeyboardAvoidingView, ScrollView, Platform } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { register } from '../../redux/authStore/actions';
@@ -12,24 +12,72 @@ const Register = () => {
     const [lastname, setLastname] = useState('');
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [emailError, setEmailError] = useState('');
+    const [passwordError, setPasswordError] = useState('');
+    const [isButtonDisabled, setIsButtonDisabled] = useState(true);
+
     const navigation = useNavigation();
-    
-    const { registerLoading, registerSuccess, isRegisterSuccess, registerError } = useSelector(state => state.auth);
+    const { registerLoading, isRegisterSuccess, registerError } = useSelector(state => state.auth);
     const dispatch = useDispatch();
+
+    const validateEmail = (email) => {
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return emailRegex.test(email);
+    };
+
+    const validatePassword = (password) => {
+        return password.length >= 4 && !/\s/.test(password);
+    };
+
+    const handleEmailChange = (text) => {
+        setEmail(text);
+        if (validateEmail(text)) {
+            setEmailError('');
+        } else {
+            setEmailError('Invalid email format');
+        }
+    };
+
+    const handlePasswordChange = (text) => {
+        setPassword(text);
+        if (validatePassword(text)) {
+            setPasswordError('');
+        } else {
+            setPasswordError('Password must be at least 4 characters and contain no spaces');
+        }
+    };
+
+    const handleRegister = () => {
+        const trimmedFirstname = firstname.trim();
+        const trimmedLastname = lastname.trim();
+        const trimmedEmail = email.trim();
+        const trimmedPassword = password.trim();
+
+        dispatch(register(
+            trimmedFirstname,
+            trimmedLastname,
+            trimmedEmail,
+            trimmedPassword
+        ));
+    };
+    useEffect(() => {
+        if (
+            firstname.trim() && 
+            lastname.trim() && 
+            email.trim() && 
+            password.trim() && 
+            validateEmail(email) && 
+            validatePassword(password)
+        ) {
+            setIsButtonDisabled(false);
+        } else {
+            setIsButtonDisabled(true);
+        }
+    }, [firstname, lastname, email, password]);
 
     useEffect(() => {
         createTables();
     }, []);
-
-    const handleRegister = () => {
-        // Dispatch the register action
-        dispatch(register(
-            firstname,
-            lastname,
-            email,
-            password
-        ));
-    };
 
     useEffect(() => {
         if (isRegisterSuccess) {
@@ -37,86 +85,87 @@ const Register = () => {
             const timer = setTimeout(() => {
                 navigation.navigate(LOGIN_ROUTE);
             }, 3000);
-
             return () => clearTimeout(timer);
         }
     }, [isRegisterSuccess]);
-    
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={styles.container}>
-            <Button onPress={()=> navigation.goBack()} icon={'arrow-left'} />
-            <Text style={styles.title}>Register</Text>            
-            <TextInput
-                label="First Name"
-                value={firstname}
-                mode="outlined"
-                onChangeText={text => setFirstname(text)}
-                style={styles.input}
-            />
-            <TextInput
-                label="Last Name"
-                value={lastname}
-                mode="outlined"
-                onChangeText={text => setLastname(text)}
-                style={styles.input}
-            />
-            <TextInput
-                label="Email"
-                value={email}
-                mode="outlined"
-                onChangeText={text => setEmail(text)}
-                style={styles.input}
-            />
-            <TextInput
-                label="Password"
-                value={password}
-                mode="outlined"
-                secureTextEntry
-                onChangeText={text => setPassword(text)}
-                style={styles.input}
-            />
+        <KeyboardAvoidingView
+          style={{flex: 1}}
+          behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+          keyboardVerticalOffset={Platform.select({
+            ios: (40),
+            android: (68),
+          })}>
+          <ScrollView
+            style={styles.container}
+            showsVerticalScrollIndicator={false}
+            contentContainerStyle={{flexGrow: 1}}>
+                <Button onPress={() => navigation.goBack()} icon={'arrow-left'} />
+                <Text style={styles.title}>Register</Text>
 
-            {/* Loader when registerLoading is true */}
-            {registerLoading ? (
-                <ActivityIndicator size="large" color="#0000ff" />
-            ) : (
-                <Button mode="contained" onPress={handleRegister} style={styles.button}>
-                    Register
-                </Button>
-            )}
+                <TextInput
+                    label="First Name"
+                    value={firstname}
+                    mode="outlined"
+                    onChangeText={text => setFirstname(text.trim())} // Trim input
+                    style={styles.input}
+                />
+                <TextInput
+                    label="Last Name"
+                    value={lastname}
+                    mode="outlined"
+                    onChangeText={text => setLastname(text.trim())} // Trim input
+                    style={styles.input}
+                />
+                <TextInput
+                    label="Email"
+                    value={email}
+                    mode="outlined"
+                    onChangeText={handleEmailChange}
+                    style={styles.input}
+                    error={!!emailError}
+                />
+                {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
 
-            {/* Displaying error message if there's any */}
-            {registerError ? <Text style={styles.error}>{registerError}</Text> : null}
-        </View>
+                <TextInput
+                    label="Password"
+                    value={password}
+                    mode="outlined"
+                    secureTextEntry
+                    onChangeText={handlePasswordChange}
+                    style={styles.input}
+                    error={!!passwordError}
+                />
+                {passwordError ? <Text style={styles.error}>{passwordError}</Text> : null}
+
+                {registerLoading ? (
+                    <ActivityIndicator size="large" color="#0000ff" />
+                ) : (
+                    <Button
+                        mode="contained"
+                        onPress={handleRegister}
+                        disabled={isButtonDisabled}
+                        style={[styles.button, isButtonDisabled && styles.disabledButton]}
+                    >
+                        Register
+                    </Button>
+                )}
+                {registerError ? <Text style={styles.error}>{registerError}</Text> : null}
+            </ScrollView>
+            </KeyboardAvoidingView>
         </TouchableWithoutFeedback>
     );
 };
 
 const styles = StyleSheet.create({
-    container: {
-        flex: 1,
-        justifyContent: 'center',
-        padding: 16,
-    },
-    title: {
-        fontSize: 24,
-        fontWeight: 'bold',
-        marginBottom: 16,
-        textAlign: 'center',
-    },
-    input: {
-        marginBottom: 16,
-    },
-    button: {
-        marginTop: 16,
-    },
-    error: {
-        marginTop: 16,
-        color: 'red',
-        textAlign: 'center',
-    },
+    container: { flex: 1, padding: 20 },
+    title: { fontSize: 24, fontWeight: 'bold', marginBottom: 20 },
+    input: { marginBottom: 15 },
+    button: { marginTop: 20 },
+    disabledButton: { backgroundColor: '#ccc' },
+    error: { color: 'red', marginBottom: 10 }
 });
 
 export default Register;

@@ -6,6 +6,7 @@ import { logoutUser } from '../redux/authStore/authSlice';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useNavigation } from '@react-navigation/native';
 import { useDispatch } from 'react-redux';
+import { LOGIN_ROUTE } from '../constants/routes';
 
 const Home = () => {
     const navigation = useNavigation();
@@ -15,7 +16,7 @@ const Home = () => {
         try {
             await AsyncStorage.removeItem('userData');
             dispatch(logoutUser());
-            navigation.replace('Login'); // Navigate to login screen
+            navigation.navigate(LOGIN_ROUTE); // Navigate to login screen
         } catch (err) {
             console.error('Problem logging out', err);
         }
@@ -38,7 +39,6 @@ const Home = () => {
 
     return (
         <View style={styles.container}>
-            <Text>Home</Text>
             <TopStories />
         </View>
     );

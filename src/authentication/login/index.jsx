@@ -1,17 +1,16 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, Alert, ActivityIndicator, TouchableWithoutFeedback, Keyboard } from 'react-native';
+import { View, StyleSheet, TouchableWithoutFeedback, Keyboard, ActivityIndicator } from 'react-native';
 import { TextInput, Button, Text } from 'react-native-paper';
-import FontAwesome from 'react-native-vector-icons/FontAwesome';
 import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../../redux/authStore/actions';
+import { login } from '../../redux/authStore/actions'; // adjust as needed
 import { useNavigation } from '@react-navigation/native';
-import { clearLoginError } from '../../redux/authStore/authSlice';
 import { createTables } from '../../db/signInDb';
-import { HOME_ROUTE } from '../../constants/routes';
+import { clearLoginError } from '../../redux/authStore/authSlice';
 
 const Login = () => {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [emailError, setEmailError] = useState('');
     const navigation = useNavigation();
     const { signInLoading, isSignInSuccess, signInError } = useSelector(state => state.auth);
     const dispatch = useDispatch();
@@ -20,70 +19,85 @@ const Login = () => {
         createTables();
     }, []);
 
-    const handleLogin = () => {
-        dispatch(login(email, password));
+    const validateEmail = (email) => {
+        const regex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        return regex.test(email);
     };
 
-    useEffect(()=> {
+    const handleEmailChange = (text) => {
+        setEmail(text);
+        if (!validateEmail(text)) {
+            setEmailError('Please enter a valid email address');
+        } else {
+            setEmailError('');
+        }
+    };
+
+    const handleLogin = () => {
+        if (!emailError) {
+            dispatch(login(email, password));
+        }
+    };
+
+    useEffect(() => {
         if (signInError) {
             setTimeout(() => {
-                dispatch(clearLoginError())
-            }, 10000)
-            return ()=> {
-                dispatch(clearLoginError())
-            }
-            
+                dispatch(clearLoginError());
+            }, 10000);
+            return () => {
+                dispatch(clearLoginError());
+            };
         }
-    }, [signInError])
+    }, [signInError]);
 
-    // Handling login side effects
     useEffect(() => {
         if (isSignInSuccess) {
-            Alert.alert('Login Successful', 'You have logged in successfully!', [
-                {
-                    text: 'OK',
-                    onPress: () => navigation.navigate('App', { screen: HOME_ROUTE })
-                
-                }
-            ]);
+            navigation.navigate('App', {
+                screen: 'Home',
+            });
         }
-        return ()=> {};
     }, [isSignInSuccess]);
+
+    const isFormValid = email.trim() !== '' && password.trim() !== '' && !emailError;
 
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
-        <View style={styles.container}>
-            <Button onPress={()=> navigation.goBack()} icon={'arrow-left'} />
-            <Text style={styles.title}>Login</Text>
+            <View style={styles.container}>
+                <Button onPress={() => navigation.goBack()} icon={'arrow-left'} />
+                <Text style={styles.title}>Login</Text>
 
-            <TextInput
-                label="Email"
-                value={email}
-                mode="outlined"
-                onChangeText={text => setEmail(text)}
-                style={styles.input}
-            />
-            <TextInput
-                label="Password"
-                value={password}
-                mode="outlined"
-                secureTextEntry
-                onChangeText={text => setPassword(text)}
-                style={styles.input}
-            />
+                <TextInput
+                    label="Email"
+                    value={email}
+                    mode="outlined"
+                    onChangeText={handleEmailChange}
+                    style={styles.input}
+                    error={!!emailError}
+                />
+                {emailError ? <Text style={styles.error}>{emailError}</Text> : null}
 
-            {/* Loader when signInLoading is true */}
-            {signInLoading ? (
-                <ActivityIndicator size="large" color="#0000ff" />
-            ) : (
-                <Button mode="contained" onPress={handleLogin} style={styles.button}>
-                    Login
-                </Button>
-            )}
-
-            {/* Displaying error message if there's any */}
-            {signInError ? <Text style={styles.error}>{signInError}</Text> : null}
-        </View>
+                <TextInput
+                    label="Password"
+                    value={password}
+                    mode="outlined"
+                    secureTextEntry
+                    onChangeText={text => setPassword(text)}
+                    style={styles.input}
+                />
+                {signInLoading ? (
+                    <ActivityIndicator size="large" color="#0000ff" />
+                ) : (
+                    <Button
+                        mode="contained"
+                        onPress={handleLogin}
+                        style={[styles.button, !isFormValid && styles.disabledButton]}
+                        disabled={!isFormValid}  // Disable the button if form is invalid
+                    >
+                        Login
+                    </Button>
+                )}
+                {signInError ? <Text style={styles.error}>{signInError}</Text> : null}
+            </View>
         </TouchableWithoutFeedback>
     );
 };
@@ -92,24 +106,26 @@ const styles = StyleSheet.create({
     container: {
         flex: 1,
         justifyContent: 'center',
-        padding: 16,
+        padding: 20,
     },
     title: {
         fontSize: 24,
         fontWeight: 'bold',
-        marginBottom: 16,
+        marginBottom: 20,
         textAlign: 'center',
     },
     input: {
-        marginBottom: 16,
+        marginBottom: 20,
     },
     button: {
-        marginTop: 16,
+        padding: 10,
+    },
+    disabledButton: {
+        backgroundColor: '#cccccc',
     },
     error: {
-        marginTop: 16,
         color: 'red',
-        textAlign: 'center',
+        marginTop: 5,
     },
 });
 

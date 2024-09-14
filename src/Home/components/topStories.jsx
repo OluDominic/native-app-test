@@ -41,7 +41,7 @@ const TopStories = () => {
     return (
         <FlatList
             data={stories}
-            keyExtractor={(item) => item.id.toString()}
+            keyExtractor={(item, index) => `${item.id}-${index}`}
             renderItem={({ item }) => (
                 <View style={styles.storyContainer}>
                     <Text style={styles.title}>{item.title}</Text>
@@ -65,9 +65,10 @@ const styles = StyleSheet.create({
         borderBottomColor: '#ccc',
     },
     title: {
-        fontSize: 18,
-        fontWeight: 'bold',
+        fontSize: 16,
+        fontWeight: '600',
         marginBottom: 8,
+        color: 'black'
     },
     url: {
         fontSize: 14,

@@ -1,4 +1,7 @@
 module.exports = {
-  presets: ['module:metro-react-native-babel-preset'],
-  plugins: ['react-native-web'],
+  presets: [
+    '@babel/preset-env', // Transpile modern JavaScript
+    '@babel/preset-react', // Transpile JSX
+    '@babel/preset-typescript' // Transpile TypeScript if you're using TypeScript
+  ],
 };

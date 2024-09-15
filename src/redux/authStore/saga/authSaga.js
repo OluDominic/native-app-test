@@ -3,15 +3,16 @@ import { login, loginError, loginSuccess, register, registerError, registerSucce
 import { authService } from "../services";
 import AsyncStorage from "@react-native-async-storage/async-storage";
 
-export function* callSignIn({payload: {email, password}}) {
+export function* callSignIn({ payload: { email, password } }) {
     console.log({ email, password }, 'Saga signin data');
+    
     try {
-        const response = yield call(authService.signInService, {email, password});
+        const response = yield call(authService.signInService, { email, password });
         yield put(loginSuccess(response));
-        yield call(AsyncStorage.setItem('userData',  JSON.stringify(response)))
+        yield call(AsyncStorage.setItem, 'userData', JSON.stringify(response));
     } catch (error) {
         const errorMessage = error.message || 'An unexpected error occurred';
-        console.log('error signin', errorMessage);
+        console.log('Error during sign in:', errorMessage);
         yield put(loginError({ message: errorMessage }));
     }
 };

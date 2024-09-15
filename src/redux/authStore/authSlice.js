@@ -15,7 +15,6 @@ const authSlice = createSlice({
             state.signInError = '';
             state.registerLoading = false;
             state.registerSuccess = {};
-            state.isRegisterSuccess = false;
             state.registerError = '';
         },
         clearLoginError: state => {

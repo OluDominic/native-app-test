@@ -1,19 +1,15 @@
 import React from 'react';
-import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import { ABOUT_ROUTE, HOME_ROUTE } from '../../constants/routes';
-import Home from '../../Home/home';
-import About from '../../about';
+import { createStackNavigator } from '@react-navigation/stack';
 import BottomNavigation from '../bottomNavigation';
 
-const AppStack = createNativeStackNavigator();
-const AppNavigation =()=> {
+const Stack = createStackNavigator();
 
-    return (
-        <AppStack.Navigator screenOptions={{headerShown: false}}>
-            <AppStack.Screen name={'Main'} component={BottomNavigation}/>
-        </AppStack.Navigator>
-    );
-}
+const AppNavigation = () => {
+  return (
+    <Stack.Navigator screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="BottomTabs" component={BottomNavigation} />
+    </Stack.Navigator>
+  );
+};
 
 export default AppNavigation;

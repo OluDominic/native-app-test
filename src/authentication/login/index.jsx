@@ -6,6 +6,7 @@ import { login } from '../../redux/authStore/actions'; // adjust as needed
 import { useNavigation } from '@react-navigation/native';
 import { createTables } from '../../db/signInDb';
 import { clearLoginError } from '../../redux/authStore/authSlice';
+import { HOME_ROUTE } from '../../constants/routes';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -53,10 +54,11 @@ const Login = () => {
     useEffect(() => {
         if (isSignInSuccess) {
             navigation.navigate('App', {
-                screen: 'Home',
-            });
+                screen: HOME_ROUTE,
+              })
         }
-    }, [isSignInSuccess]);
+      }, [isSignInSuccess]);
+    
 
     const isFormValid = email.trim() !== '' && password.trim() !== '' && !emailError;
 

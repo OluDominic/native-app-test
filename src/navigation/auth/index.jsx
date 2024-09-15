@@ -1,13 +1,13 @@
 import React from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import { LOGIN_ROUTE, ONBOARD_ROUTE, REGISTER_ROUTE, SPLASH_ROUTE } from '../../constants/routes';
 import Splash from '../../welcome/splash';
 import Login from '../../authentication/login';
 import Register from '../../authentication/register';
 import OnBoard from '../../authentication/onboard/onboard';
 
-const AuthStack = createNativeStackNavigator();
+const AuthStack = createStackNavigator();
 const AuthNavigation =()=> {
 
     return (

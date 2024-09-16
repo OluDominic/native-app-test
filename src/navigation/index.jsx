@@ -1,42 +1,53 @@
 import React, { useState, useEffect } from 'react';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
-import AppNavigation from './app';
-import AuthNavigation from './auth';
+import { createStackNavigator } from '@react-navigation/stack';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useSelector } from 'react-redux';
 
-const Stack = createNativeStackNavigator();
+import Splash from '../welcome/splash';
+import Login from '../authentication/login';
+import Register from '../authentication/register';
+import OnBoard from '../authentication/onboard/onboard';
+
+import Home from '../Home/home';
+import About from '../about';
+
+import { ABOUT_ROUTE, HOME_ROUTE, LOGIN_ROUTE, ONBOARD_ROUTE, REGISTER_ROUTE, SPLASH_ROUTE } from '../constants/routes';
+import AppNavigation from './app';
+
+const Stack = createStackNavigator();
 
 function AppNavigationContainer() {
-    const [isAuthenticated, setAuthenticated] = useState(false);  // Local state for auth status
-    const { authenticated } = useSelector(state => state.auth); // Pulling auth status from redux
+    const [isAuthenticated, setAuthenticated] = useState(null); // Initialize as null to show loading state
+    const { authenticated } = useSelector(state => state.auth);
 
     useEffect(() => {
         const checkAuthStatus = async () => {
             try {
-                const userData = await AsyncStorage.getItem('userData');  // Fetch user data from AsyncStorage
-                setAuthenticated(userData !== null); // If userData exists, set authenticated to true
+                const userData = await AsyncStorage.getItem('userData');
+                setAuthenticated(userData !== null);
             } catch (error) {
                 console.log('Error retrieving user data:', error);
+                setAuthenticated(false);
             }
         };
 
-        checkAuthStatus(); // Run this once when the app loads
-    }, [authenticated]); // Run again if login success changes
+        checkAuthStatus();
+    }, [authenticated]);
+
+    if (isAuthenticated === null) {
+        // Show a loading spinner or splash screen while checking authentication
+        return <Splash />;
+    }
 
     return (
         <NavigationContainer>
             <Stack.Navigator screenOptions={{ headerShown: false }}>
-                {isAuthenticated ? (
-                    <Stack.Group>
-                        <Stack.Screen name='App' component={AppNavigation} />
-                    </Stack.Group>
-                ) : (
-                    <Stack.Group>
-                        <Stack.Screen name='Auth' component={AuthNavigation} />
-                    </Stack.Group>
-                )}
+                        <Stack.Screen name={SPLASH_ROUTE} component={Splash} />
+                        <Stack.Screen name={LOGIN_ROUTE} component={Login} />
+                        <Stack.Screen name={REGISTER_ROUTE} component={Register} />
+                        <Stack.Screen name={ONBOARD_ROUTE} component={OnBoard} />
+                        <Stack.Screen name="AppTabs" component={AppNavigation} />
             </Stack.Navigator>
         </NavigationContainer>
     );

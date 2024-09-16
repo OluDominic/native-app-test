@@ -1,11 +1,11 @@
 import React, { useState, useEffect } from 'react';
-import { View, StyleSheet, TouchableWithoutFeedback, Keyboard, ActivityIndicator } from 'react-native';
-import { TextInput, Button, Text } from 'react-native-paper';
-import { useDispatch, useSelector } from 'react-redux';
-import { login } from '../../redux/authStore/actions'; // adjust as needed
+import { View, Text, Keyboard, TouchableWithoutFeedback, Alert, ActivityIndicator, StyleSheet } from 'react-native';
+import { TextInput, Button } from 'react-native-paper';
 import { useNavigation } from '@react-navigation/native';
-import { createTables } from '../../db/signInDb';
+import { useDispatch, useSelector } from 'react-redux';
 import { clearLoginError } from '../../redux/authStore/authSlice';
+import { login } from '../../redux/authStore/actions';
+import { createTables } from '../../db/signInDb';
 import { HOME_ROUTE } from '../../constants/routes';
 
 const Login = () => {
@@ -17,7 +17,7 @@ const Login = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        createTables();
+        createTables(); // Assuming this is your database initialization
     }, []);
 
     const validateEmail = (email) => {
@@ -40,25 +40,24 @@ const Login = () => {
         }
     };
 
+    // Show an alert if there's a sign-in error
     useEffect(() => {
         if (signInError) {
+            Alert.alert("Login Error", signInError, [{ text: "OK", onPress: () => dispatch(clearLoginError()) }]);
             setTimeout(() => {
                 dispatch(clearLoginError());
             }, 10000);
-            return () => {
-                dispatch(clearLoginError());
-            };
         }
-    }, [signInError]);
+    }, [signInError, dispatch]);
 
     useEffect(() => {
         if (isSignInSuccess) {
-            navigation.navigate('App', {
-                screen: HOME_ROUTE,
-              })
+            navigation.reset({
+                index: 0,
+                routes: [{ name: 'AppTabs', state: { routes: [{ name: HOME_ROUTE }] } }],
+            });
         }
-      }, [isSignInSuccess]);
-    
+    }, [isSignInSuccess, navigation]);
 
     const isFormValid = email.trim() !== '' && password.trim() !== '' && !emailError;
 
@@ -86,19 +85,19 @@ const Login = () => {
                     onChangeText={text => setPassword(text)}
                     style={styles.input}
                 />
-                {signInLoading ? (
-                    <ActivityIndicator size="large" color="#0000ff" />
-                ) : (
-                    <Button
-                        mode="contained"
-                        onPress={handleLogin}
-                        style={[styles.button, !isFormValid && styles.disabledButton]}
-                        disabled={!isFormValid}  // Disable the button if form is invalid
-                    >
-                        Login
-                    </Button>
-                )}
-                {signInError ? <Text style={styles.error}>{signInError}</Text> : null}
+
+                <Button
+                    mode="contained"
+                    onPress={handleLogin}
+                    style={[styles.button, !isFormValid && styles.disabledButton]}
+                    disabled={!isFormValid || signInLoading} // Disable while loading or invalid form
+                >
+                    {signInLoading ? (
+                        <ActivityIndicator size="small" color="#fff" />
+                    ) : (
+                        "Login"
+                    )}
+                </Button>
             </View>
         </TouchableWithoutFeedback>
     );

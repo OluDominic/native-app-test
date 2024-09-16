@@ -1,10 +1,11 @@
 import axios from 'axios';
 import React, { useEffect, useState } from 'react';
-import { FlatList, Text, View, StyleSheet, Linking } from 'react-native';
+import { VirtualizedList, Text, View, StyleSheet, Linking } from 'react-native';
 
 const TopStories = () => {
     const [stories, setStories] = useState([]);
     const [currentPage, setCurrentPage] = useState(0);
+    const [storyIds, setStoryIds] = useState([]);
 
     useEffect(() => {
         fetchTopStories();
@@ -12,35 +13,43 @@ const TopStories = () => {
 
     const fetchTopStories = async () => {
         try {
-            const { data: storyIds } = await axios.get('https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty');
-            const storyRequests = storyIds.slice(0, 10).map(id => axios.get(`https://hacker-news.firebaseio.com/v0/item/${id}.json`));
-            const storyResponses = await Promise.all(storyRequests);
-            setStories(storyResponses.map(res => res.data));
+            const { data } = await axios.get('https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty');
+            setStoryIds(data);
+            loadStories(data.slice(0, 10));
         } catch (error) {
             console.log('Error fetching top stories:', error);
         }
     };
 
-    const pagination = async () => {
+    const loadStories = async (ids) => {
         try {
-            const { data: storyIds } = await axios.get('https://hacker-news.firebaseio.com/v0/topstories.json?print=pretty');
-            const newStoryIds = storyIds.slice(currentPage * 10, (currentPage + 1) * 10);
-            const newStoryRequests = newStoryIds.map(id => axios.get(`https://hacker-news.firebaseio.com/v0/item/${id}.json`));
-            const newStoryResponses = await Promise.all(newStoryRequests);
-            setStories([...stories, ...newStoryResponses.map(res => res.data)]);
-            setCurrentPage(currentPage + 1);
+            const storyRequests = ids.map(id => axios.get(`https://hacker-news.firebaseio.com/v0/item/${id}.json`));
+            const storyResponses = await Promise.all(storyRequests);
+            setStories(prevStories => [...prevStories, ...storyResponses.map(res => res.data)]);
         } catch (error) {
-            console.error('Error loading more stories:', error);
+            console.error('Error loading stories:', error);
         }
+    };
+
+    const pagination = () => {
+        const nextPage = currentPage + 1;
+        const newStoryIds = storyIds.slice(nextPage * 10, (nextPage + 1) * 10); // Load next 10 stories
+        loadStories(newStoryIds);
+        setCurrentPage(nextPage);
     };
 
     const handleUrlPress = (url) => {
         Linking.openURL(url).catch(err => console.error('Failed to open URL:', err));
     };
 
+    const getItem = (data, index) => data[index];
+
+    const getItemCount = (data) => data.length;
+
     return (
-        <FlatList
+        <VirtualizedList
             data={stories}
+            initialNumToRender={10}
             keyExtractor={(item, index) => `${item.id}-${index}`}
             renderItem={({ item }) => (
                 <View style={styles.storyContainer}>
@@ -52,6 +61,8 @@ const TopStories = () => {
                     )}
                 </View>
             )}
+            getItem={getItem}
+            getItemCount={getItemCount}
             onEndReached={pagination}
             onEndReachedThreshold={0.5}
         />

@@ -1,3 +1,4 @@
+import React from 'react'; 
 import { createBottomTabNavigator } from '@react-navigation/bottom-tabs';
 import About from '../../about';
 import Home from '../../Home/home';
@@ -6,7 +7,7 @@ import FontAwesome from 'react-native-vector-icons/FontAwesome';
 
 const Tab = createBottomTabNavigator();
 
-function BottomNavigation() {
+const  BottomNavigation =() => {
   return (
     <Tab.Navigator>
       <Tab.Screen 

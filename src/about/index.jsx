@@ -42,13 +42,13 @@ const About = () => {
       <Card style={styles.card}>
         <Card.Content>
           <Text style={styles.label}>First Name:</Text>
-          <Text style={styles.value}>{userData.firstname}</Text>
+          <Text style={styles.value}>{userData?.firstname}</Text>
 
           <Text style={styles.label}>Last Name:</Text>
-          <Text style={styles.value}>{userData.lastname}</Text>
+          <Text style={styles.value}>{userData?.lastname}</Text>
 
           <Text style={styles.label}>Email:</Text>
-          <Text style={styles.value}>{userData.email}</Text>
+          <Text style={styles.value}>{userData?.email}</Text>
         </Card.Content>
       </Card>
     </View>

@@ -15,14 +15,16 @@ const Home = () => {
     const handleLogout = async () => {
         try {
             await AsyncStorage.removeItem('userData');
-            dispatch(logoutUser());
-            navigation.navigate(LOGIN_ROUTE); // Navigate to login screen
+            dispatch(logoutUser());  // This will update the Redux `authenticated` state
+            
+            // Navigate to the login screen or home screen after logout
+            navigation.navigate(LOGIN_ROUTE);  // Ensure LOGIN_ROUTE is the name of your login screen
         } catch (err) {
             console.error('Problem logging out', err);
         }
     };
+    
 
-    // Set up a button in the top right corner of the header
     useLayoutEffect(() => {
         navigation.setOptions({
             headerRight: () => (

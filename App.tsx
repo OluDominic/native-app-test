@@ -25,7 +25,7 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 import { NavigationContainer } from '@react-navigation/native';
-import { createNativeStackNavigator } from '@react-navigation/native-stack';
+import { createStackNavigator } from '@react-navigation/stack';
 import Home from './src/Home/home';
 import Splash from './src/welcome/splash';
 import { SafeAreaProvider } from 'react-native-safe-area-context';
@@ -44,7 +44,7 @@ function HomeScreen() {
     </View>
   );
 }
-const Stack = createNativeStackNavigator();
+const Stack = createStackNavigator();
 
 function App(): JSX.Element {
   const isDarkMode = useColorScheme() === 'dark';

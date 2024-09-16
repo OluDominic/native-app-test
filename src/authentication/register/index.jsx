@@ -4,8 +4,9 @@ import { TextInput, Button, Text } from 'react-native-paper';
 import { useDispatch, useSelector } from 'react-redux';
 import { register } from '../../redux/authStore/actions';
 import { useNavigation } from '@react-navigation/native';
-import { createTables } from '../../db/signInDb';
+import { createTables } from '../../db';
 import { LOGIN_ROUTE } from '../../constants/routes';
+import { clearRegisterError } from '../../redux/authStore/authSlice';
 
 const Register = () => {
     const [firstname, setFirstname] = useState('');
@@ -102,7 +103,10 @@ const Register = () => {
             style={styles.container}
             showsVerticalScrollIndicator={false}
             contentContainerStyle={{flexGrow: 1}}>
-                <Button onPress={() => navigation.goBack()} icon={'arrow-left'} />
+                <Button onPress={() => {
+                    navigation.goBack()
+                    dispatch(clearRegisterError())
+                    }} icon={'arrow-left'} />
                 <Text style={styles.title}>Register</Text>
 
                 <TextInput

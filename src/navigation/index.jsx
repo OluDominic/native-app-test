@@ -9,10 +9,7 @@ import Login from '../authentication/login';
 import Register from '../authentication/register';
 import OnBoard from '../authentication/onboard/onboard';
 
-import Home from '../Home/home';
-import About from '../about';
-
-import { ABOUT_ROUTE, HOME_ROUTE, LOGIN_ROUTE, ONBOARD_ROUTE, REGISTER_ROUTE, SPLASH_ROUTE } from '../constants/routes';
+import { LOGIN_ROUTE, ONBOARD_ROUTE, REGISTER_ROUTE, SPLASH_ROUTE } from '../constants/routes';
 import AppNavigation from './app';
 
 const Stack = createStackNavigator();

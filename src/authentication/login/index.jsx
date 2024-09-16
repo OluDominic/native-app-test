@@ -5,8 +5,9 @@ import { useNavigation } from '@react-navigation/native';
 import { useDispatch, useSelector } from 'react-redux';
 import { clearLoginError } from '../../redux/authStore/authSlice';
 import { login } from '../../redux/authStore/actions';
-import { createTables } from '../../db/signInDb';
-import { HOME_ROUTE } from '../../constants/routes';
+import { createTables } from '../../db';
+import { HOME_ROUTE , ONBOARD_ROUTE } from '../../constants/routes';
+ '../../constants/routes';
 
 const Login = () => {
     const [email, setEmail] = useState('');
@@ -17,7 +18,7 @@ const Login = () => {
     const dispatch = useDispatch();
 
     useEffect(() => {
-        createTables(); // Assuming this is your database initialization
+        createTables();
     }, []);
 
     const validateEmail = (email) => {
@@ -40,7 +41,6 @@ const Login = () => {
         }
     };
 
-    // Show an alert if there's a sign-in error
     useEffect(() => {
         if (signInError) {
             Alert.alert("Login Error", signInError, [{ text: "OK", onPress: () => dispatch(clearLoginError()) }]);
@@ -64,7 +64,10 @@ const Login = () => {
     return (
         <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
             <View style={styles.container}>
-                <Button onPress={() => navigation.goBack()} icon={'arrow-left'} />
+                <Button onPress={() => {
+                    navigation.navigate(ONBOARD_ROUTE)
+                    dispatch(clearLoginError())
+                    }} icon={'arrow-left'} />
                 <Text style={styles.title}>Login</Text>
 
                 <TextInput
@@ -114,6 +117,7 @@ const styles = StyleSheet.create({
         fontWeight: 'bold',
         marginBottom: 20,
         textAlign: 'center',
+        color: 'black'
     },
     input: {
         marginBottom: 20,

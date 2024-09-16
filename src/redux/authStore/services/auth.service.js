@@ -1,5 +1,5 @@
 import axios from 'axios';
-import { loginUser, registerUser } from '../../../db/signInDb';
+import { loginUser, registerUser } from '../../../db';
 
 export default class AuthService {
     signInService ({ email, password }) {
